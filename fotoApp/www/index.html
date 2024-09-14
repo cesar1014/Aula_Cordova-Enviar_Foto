@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Foto App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        img {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tire uma Foto</h1>
+    <button onclick="tirarFoto()">Tirar Foto</button>
+    <img id="lugarfoto" src="" alt="Foto será exibida aqui">
+    <button onclick="enviarFoto()">Enviar Foto</button>
+
+    <script>
+        let imageData;
+
+        function tirarFoto() {
+            navigator.camera.getPicture(onSuccess, onFail, {
+                quality: 50,
+                destinationType: Camera.DestinationType.DATA_URL,
+                sourceType: Camera.PictureSourceType.CAMERA
+            });
+        }
+
+        function onSuccess(data) {
+            imageData = data;
+            var image = document.getElementById('lugarfoto');
+            image.src = "data:image/jpeg;base64," + imageData;
+        }
+
+        function onFail(message) {
+            alert('Failed because: ' + message);
+        }
+
+        function enviarFoto() {
+            if (!imageData) {
+                alert('Tire uma foto primeiro!');
+                return;
+            }
+
+            const xhr = new XMLHttpRequest();
+            const url = 'http://localhost/fotoApp/salvar_foto.php';
+            const formData = new FormData();
+            formData.append('foto', imageData);
+
+            xhr.open('POST', url, true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('Foto enviada com sucesso!');
+                } else {
+                    alert('Erro ao enviar a foto.');
+                }
+            };
+            xhr.send(formData);
+        }
+    </script>
+</body>
+</html>
